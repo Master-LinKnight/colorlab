@@ -13,6 +13,9 @@
 
 依赖只有 numpy + Pillow（MCP 模式额外需要 `mcp`）。
 
+> 用的是 **DaVinci Resolve Studio**（自带原生 MCP）？两者是互补关系，不是替代 ——
+> 它解决"能操作"，colorlab 解决"往哪调"。见下文「和 DaVinci Resolve Studio 的分工」。
+
 ---
 
 ## 安装
@@ -179,6 +182,48 @@ A 的产物可以直接被 B 接管：`derive` 出来的 JSON 就是一份普通
 
 一句话：**colorlab 负责"把调色参数化并算出 LUT"，不负责"替你看片做审美判断"，也不负责
 "用 LUT 做 LUT 做不到的事"。**
+
+---
+
+## 和 DaVinci Resolve Studio 的分工：互补，不是替代
+
+如果你买的是 **DaVinci Resolve Studio**（付费版），它从 21.1（2026 年 9 月）起自带**原生
+MCP 服务器**，agent 可以直接建节点、加窗口、跟踪蒙版。外部脚本 API 也是 Studio 专属：
+免费版从 19.1 起就不能被外部进程调用，只能在应用内控制台跑；21.1 又把 Python 划归 Studio，
+免费版控制台里只剩 Lua。
+
+很多人会问：那还要 colorlab 干什么？因为**两者解决的不是同一个问题**：
+
+> **DaVinci Resolve Studio 的 MCP 解决"能操作"，colorlab 解决"往哪调"。**
+
+| | DaVinci Resolve Studio 原生 MCP | colorlab |
+|---|---|---|
+| 建节点、加窗口、跟踪蒙版 | ✅ 强项 | ❌ 不做，交给 DaVinci Resolve |
+| 判断"绿色压到 0.74、花往红推 18°" | ❌ 不会自己判断 | ✅ `compare` 给出数字依据 |
+| 参数可 diff、可复现 | ❌ 存在工程里，没法 diff | ✅ 一份 JSON |
+| 跨软件交付（Premiere / OBS / Nuke / 手机） | ❌ `.drx` 出了 DaVinci Resolve 就废 | ✅ `.cube` 通用 |
+| 不开 DaVinci Resolve 的离线批量烘焙 | ❌ 得开着软件 | ✅ 纯离线，可进 CI |
+| 单帧分析报告（给客户 / QA 看） | ❌ 没有这类现成输出 | ✅ `analyze` / `compare` |
+
+*（比的是开箱能力。理论上用脚本也能自己算统计，但 Studio 的 MCP 不提供这种输出。）*
+
+**典型配合方式**：
+
+```
+colorlab（不需要开 DaVinci Resolve）
+    analyze → compare → 定 Look → bake .cube
+                    ↓
+DaVinci Resolve Studio MCP（agent 直接操作）
+    导入 LUT 建节点 → 补 LUT 做不到的：暗角、轮廓光、局部提亮 → 跟踪蒙版
+                    ↓
+    交付：LUT（给别的软件）+ 工程（给自己）+ 分析报告（给客户）
+```
+
+也就是说：**colorlab 出配方，DaVinci Resolve 出手艺**。LUT 负责"整体色关系"，窗口和蒙版负责
+"光落在那儿"，这两件事本来就不该指望一个工具全包。
+
+**什么情况下不需要 colorlab**：一次性项目、只在自己机器上用 Studio 手调、而且很清楚要什么——
+这时候直接调更快，colorlab 的价值在多批次、跨软件交付、需要留可复现参数的时候。
 
 ---
 
