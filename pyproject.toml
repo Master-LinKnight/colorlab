@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "colorlab"
+version = "0.1.0"
+description = "色彩分析、Look 设计与 3D LUT 生成（DaVinci Resolve）"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "numpy>=1.23",
+    "pillow>=9.0",
+]
+
+[project.optional-dependencies]
+mcp = ["mcp>=1.2"]
+dev = ["pytest>=7"]
+
+[project.scripts]
+colorlab = "colorlab.cli:main"
+colorlab-mcp = "colorlab.mcp_server:main"
+
+[tool.setuptools]
+packages = ["colorlab"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

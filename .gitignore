@@ -1,0 +1,22 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+.DS_Store
+
+# 生成的产物
+out/
+*.cube
+
+# 本地素材（静帧、参考图不进仓库）
+assets/
+*.jpg
+*.jpeg
+*.png
+!docs/**/*.png
+
+# 测试缓存
+.pytest_cache/
