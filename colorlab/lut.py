@@ -25,7 +25,7 @@ def bake(look: Look, size: int = 33) -> np.ndarray:
 
 # --------------------------------------------------------------------- write
 def write_cube(path, lut: np.ndarray, title: str = None, domain=(0.0, 1.0)) -> Path:
-    """写出 Resolve / Nuke / OBS 都能读的 .cube（3D）。"""
+    """写出 DaVinci Resolve / Nuke / OBS 都能读的 .cube（3D）。"""
     path = Path(path)
     lut = np.asarray(lut, dtype=np.float64)
     if lut.ndim != 4 or lut.shape[-1] != 3 or len(set(lut.shape[:3])) != 1:

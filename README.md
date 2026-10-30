@@ -79,7 +79,7 @@ python3 -m colorlab sheet src.jpg --ref ref.png --look looks/lotus_sunset_dusk.j
 | 差别在光位、明暗结构、局部光（逆光、暗角、轮廓光） | **两条都不够**，见下文「做不到」 | "参考图那种背景很暗、主体被光打亮的感觉" |
 
 判定口径很简单：**差别能被"一个颜色映射"描述就走 A，不能被描述就走 B，而 B 也表达不了的部分
-只能回 Resolve 用手工节点。**
+只能回 DaVinci Resolve 用手工节点。**
 
 ---
 
@@ -162,15 +162,20 @@ A 的产物可以直接被 B 接管：`derive` 出来的 JSON 就是一份普通
 **不能做（别过度期待）**
 
 - **不能复制参考图的"光"**。暗角、轮廓光、局部提亮、逆光氛围，这些是空间信息，3D LUT 是逐像素
-  映射，表达不了。要回 DaVinci Resolve 用 Power Window / Magic Mask 补。
+  映射，表达不了。要回 DaVinci Resolve 用 Power Window（窗口）+ 限定器补。
 - **不能自动判断"好看"**。`derive` 只对齐统计量，不会知道哪张图更有味道；`compare` 只给数字，
   不给结论。判断始终在人（或 agent 看预览）。
 - **不能从有损素材里救回信息**。已经烧死的高光、糊成一团的暗部，LUT 变不出来。
 - **不能跨场景保证一致**。不同光位、不同镜头、不同构图的素材，LUT 挂上去观感会差很远。
 - **不做色彩空间自动识别**。它不知道你的素材是 Log 还是 Rec.709，得你告诉它；LUT 是按显示参考
   （Rec.709 / Gamma 2.4）烘焙的，Log 素材必须先 CST。
-- **不处理视频**。只吃静帧；要做整条片子，把 LUT 拿到 Resolve / 剪辑软件里套。
-- **只输出 `.cube`**。不生成 `.3dl`、`.vlut`、DCTL 或 Resolve 的 `.drx` 节点树。
+- **不处理视频**。只吃静帧；要做整条片子，把 LUT 拿到 DaVinci Resolve / 剪辑软件里套。
+- **只输出 `.cube`**。不生成 `.3dl`、`.vlut`、DCTL 或 DaVinci Resolve 的 `.drx` 节点树。
+
+**关于 DaVinci Resolve 的版本**：这里说的都是 **DaVinci Resolve**（Blackmagic Design 的调色软件，
+免费版就叫这个名字），没有特指付费版。生成的 `.cube` LUT 在**免费版和付费版
+（DaVinci Resolve Studio）里都能导入**；文中偶尔提到的 Magic Mask 属于 Studio 版功能，
+免费版用 Power Window + 限定器（Qualifier）替代即可。
 
 一句话：**colorlab 负责"把调色参数化并算出 LUT"，不负责"替你看片做审美判断"，也不负责
 "用 LUT 做 LUT 做不到的事"。**
@@ -237,7 +242,7 @@ analyze_image(素材) → analyze_image(参考) → compare_images
 ```
 
 工具全部返回 JSON，路径用绝对路径。LUT 是逐像素映射，暗角/局部光这类空间操作
-不会被 LUT 表达，agent 应该提醒用户回 Resolve 补窗口节点。
+不会被 LUT 表达，agent 应该提醒用户回 DaVinci Resolve 补窗口节点。
 
 ### 配套 skill
 
